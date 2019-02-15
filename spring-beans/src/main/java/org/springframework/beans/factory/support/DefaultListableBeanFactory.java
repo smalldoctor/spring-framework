@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -584,7 +584,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (bd instanceof AbstractBeanDefinition) {
 				AbstractBeanDefinition abd = (AbstractBeanDefinition) bd;
 				if (abd.hasBeanClass()) {
-					ann = AnnotationUtils.findAnnotation(abd.getBeanClass(), annotationType);
+					Class<?> beanClass = abd.getBeanClass();
+					if (beanClass != beanType) {
+						ann = AnnotationUtils.findAnnotation(beanClass, annotationType);
+					}
 				}
 			}
 		}
@@ -1549,7 +1552,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						super.resolveCandidate(beanName, requiredType, beanFactory));
 			}
 		};
-		return Optional.ofNullable(doResolveDependency(descriptorToUse, beanName, null, null));
+		Object result = doResolveDependency(descriptorToUse, beanName, null, null);
+		return (result instanceof Optional ? (Optional<?>) result : Optional.ofNullable(result));
 	}
 
 
@@ -1610,7 +1614,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 			// Lenient fallback: dummy factory in case of original factory not found...
-			return new DefaultListableBeanFactory();
+			DefaultListableBeanFactory dummyFactory = new DefaultListableBeanFactory();
+			dummyFactory.serializationId = this.id;
+			return dummyFactory;
 		}
 	}
 
@@ -1628,7 +1634,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * A dependency descriptor marker for multiple elements.
+	 * A dependency descriptor for a multi-element declaration with nested elements.
 	 */
 	private static class MultiElementDescriptor extends NestedDependencyDescriptor {
 

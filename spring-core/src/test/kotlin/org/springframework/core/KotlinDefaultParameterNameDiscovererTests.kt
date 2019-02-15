@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package org.springframework.core.io.buffer;
+package org.springframework.core
 
-/**
- * Extension of {@link DataBuffer} that allows for buffer that share a memory
- * pool. Introduces methods for reference counting.
- *
- * @author Arjen Poutsma
- * @since 5.0
- */
-public interface PooledDataBuffer extends DataBuffer {
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
-	/**
-	 * Increase the reference count for this buffer by one.
-	 * @return this buffer
-	 */
-	PooledDataBuffer retain();
+class KotlinDefaultParameterNameDiscovererTests {
 
-	/**
-	 * Decrease the reference count for this buffer by one, and release it
-	 * once the count reaches zero.
-	 * @return {@code true} if the buffer was released; {@code false} otherwise
-	 */
-	boolean release();
+	private val parameterNameDiscoverer = DefaultParameterNameDiscoverer()
 
+	enum class MyEnum {
+		ONE, TWO
+	}
+
+	@Test  // SPR-16931
+	fun getParameterNamesOnEnum() {
+		val constructor = MyEnum::class.java.declaredConstructors[0]
+		val actualParams = parameterNameDiscoverer.getParameterNames(constructor)
+		assertEquals(2, actualParams!!.size)
+	}
 }

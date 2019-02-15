@@ -172,7 +172,7 @@ class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
 	public ServerResponse.BodyBuilder cacheControl(CacheControl cacheControl) {
 		String ccValue = cacheControl.getHeaderValue();
 		if (ccValue != null) {
-			this.headers.setCacheControl(cacheControl.getHeaderValue());
+			this.headers.setCacheControl(ccValue);
 		}
 		return this;
 	}
@@ -272,6 +272,9 @@ class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
 	}
 
 
+	/**
+	 * Abstract base class for {@link ServerResponse} implementations.
+	 */
 	abstract static class AbstractServerResponse implements ServerResponse {
 
 		private static final Set<HttpMethod> SAFE_METHODS = EnumSet.of(HttpMethod.GET, HttpMethod.HEAD);

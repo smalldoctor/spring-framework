@@ -81,14 +81,9 @@ public class Jaxb2XmlDecoder extends AbstractDecoder<Object> {
 
 	@Override
 	public boolean canDecode(ResolvableType elementType, @Nullable MimeType mimeType) {
-		if (super.canDecode(elementType, mimeType)) {
-			Class<?> outputClass = elementType.getRawClass();
-			return (outputClass != null && (outputClass.isAnnotationPresent(XmlRootElement.class) ||
-					outputClass.isAnnotationPresent(XmlType.class)));
-		}
-		else {
-			return false;
-		}
+		Class<?> outputClass = elementType.getRawClass();
+		return (outputClass != null && (outputClass.isAnnotationPresent(XmlRootElement.class) ||
+				outputClass.isAnnotationPresent(XmlType.class)) && super.canDecode(elementType, mimeType));
 	}
 
 	@Override
@@ -110,6 +105,7 @@ public class Jaxb2XmlDecoder extends AbstractDecoder<Object> {
 	@Override
 	public Mono<Object> decodeToMono(Publisher<DataBuffer> inputStream, ResolvableType elementType,
 			@Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
 		return decode(inputStream, elementType, mimeType, hints).singleOrEmpty();
 	}
 
